@@ -1,4 +1,4 @@
-import { dbService, domService } from '../../services';
+import { clientService, dbService, domService } from '../../services';
 
 export default class CmcModule {
   constructor() {
@@ -62,6 +62,8 @@ export default class CmcModule {
       for (const tokenUrl of newTokenUrls) {
         const info = await this.parseTokenDataFromDocument(tokenUrl);
         console.log('[module:CMC] new token', info.contract);
+        clientService.openPancakeSwap(info.contract);
+        clientService.openPoocoinChart(info.contract);
       }
     }, 1000);
   }

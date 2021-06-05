@@ -5,11 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node --experimental-specifier-resolution=node main.js",
-    "build": "cross-env NODE_ENV=production webpack --config webpack.config.prod.js",
-    "dev:watch": "cross-env NODE_ENV=development webpack --config webpack.config.dev.js --watch",
-    "serve": "npm run build:dev && npm-run-all --parallel dev:watch dev:nodemon",
-    "dev:nodemon": "cross-env NODE_ENV=development nodemon dev/dev.build.js"
+    "start": "node --experimental-specifier-resolution=node index.js",
+    "dev": "nodemon --experimental-specifier-resolution=node index.js"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +14,7 @@
   "dependencies": {
     "got": "^11.8.2",
     "jsdom": "^16.6.0",
+    "open": "^8.2.0",
     "socket.io": "^4.1.2"
   },
   "devDependencies": {
