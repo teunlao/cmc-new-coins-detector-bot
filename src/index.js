@@ -74,9 +74,9 @@ const getTokenInfo = async (tokenUrl) => {
 }
 
 const detectChanges = () => {
+  console.log('waiting for new listings...', new Date())
   getStateFromDb()
   setInterval(async () => {
-    console.log('waiting for new listings...')
     await updateState()
     const newTokenUrls = getStateChanges()
     if (newTokenUrls.length) {
@@ -88,8 +88,10 @@ const detectChanges = () => {
       io.sockets.emit('newToken', info)
     }
   }, 1000)
+
+  setInterval(() => {
+    console.log('waiting for new listings...', new Date())
+  }, 60000)
 }
 
-setTimeout(() => {
-  detectChanges()
-}, 5000)
+detectChanges()
