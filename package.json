@@ -1,10 +1,15 @@
 {
+  "type": "module",
   "name": "cmc-new-coins-detector-bot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node --experimental-specifier-resolution=node main.js",
+    "build": "cross-env NODE_ENV=production webpack --config webpack.config.prod.js",
+    "dev:watch": "cross-env NODE_ENV=development webpack --config webpack.config.dev.js --watch",
+    "serve": "npm run build:dev && npm-run-all --parallel dev:watch dev:nodemon",
+    "dev:nodemon": "cross-env NODE_ENV=development nodemon dev/dev.build.js"
   },
   "keywords": [],
   "author": "",
@@ -15,8 +20,22 @@
     "socket.io": "^4.1.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.14.3",
+    "@babel/preset-env": "^7.14.4",
     "@types/got": "^9.6.11",
     "@types/jsdom": "^16.2.10",
-    "@types/socket.io": "^3.0.2"
+    "@types/socket.io": "^3.0.2",
+    "babel-loader": "^8.2.2",
+    "babel-preset-es2015-native-modules": "^6.9.4",
+    "canvas": "^2.8.0",
+    "cross-env": "^7.0.3",
+    "native-ext-loader": "^2.3.0",
+    "node-loader": "^2.0.0",
+    "nodemon-webpack-plugin": "^4.5.2",
+    "prettier": "^2.3.1",
+    "source-map-support": "^0.5.19",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.0",
+    "webpack-node-externals": "^3.0.0"
   }
 }
