@@ -2,7 +2,7 @@ import { dbService, domService } from '../../services';
 
 export default class CmcModule {
   constructor() {
-    this.DB_PATH = 'cmc.json';
+    this.DB_PATH = 'db/cmc.json';
     this.DEFAULT_URL = 'https://coinmarketcap.com';
     this.state = {
       previous: [],
@@ -18,18 +18,22 @@ export default class CmcModule {
         .filter((tr) => tr.querySelectorAll('td')[8].textContent === 'Binance Coin')
         .map((tr) => tr.querySelector('a').href);
     } catch (err) {
-      console.warn('[ERROR]: parseTokensUrlsFromDocument');
+      console.warn('[module:CMC]: ERROR - parseTokensUrlsFromDocument');
       throw err;
     }
   }
 
   async parseTokenDataFromDocument(tokenUrl) {
-    const url = `${this.DEFAULT_URL}${tokenUrl}`;
-    const document = await domService.getDocument(url);
-    const bscScanUrl = document.querySelector('.container > :nth-child(2) >:nth-child(5) >:nth-child(3) a').href;
-    const contract = bscScanUrl.split('/token/')[1];
-
-    return { contract, bscScanUrl, cmcUrl: url };
+    try {
+      const url = `${this.DEFAULT_URL}${tokenUrl}`;
+      const document = await domService.getDocument(url);
+      const bscScanUrl = document.querySelector('.container > :nth-child(2) >:nth-child(5) >:nth-child(3) a').href;
+      const contract = bscScanUrl.split('/token/')[1];
+      return { contract, bscScanUrl, cmcUrl: url };
+    } catch (err) {
+      console.warn('[module:CMC]: ERROR - parseTokenDataFromDocument');
+      throw err;
+    }
   }
 
   async updateState() {
@@ -57,7 +61,7 @@ export default class CmcModule {
       }
       for (const tokenUrl of newTokenUrls) {
         const info = await this.parseTokenDataFromDocument(tokenUrl);
-        console.log('!!! NEW TOKEN !!!', info);
+        console.log('[module:CMC] new token', info.contract);
       }
     }, 1000);
   }
