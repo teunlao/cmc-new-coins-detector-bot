@@ -21,9 +21,9 @@ export default class TelegramService {
     this.chats.forEach((chat) => {
       this.bot.sendMessage(
         chat.id,
-        `[${module}]: ${contract}\n
-        ${this.#POOCOIN_URL}/tokens/${contract}\n
-        ${this.#PCS_URL}/#/swap?outputCurrency=${contract}`
+        `[${module}]: ${contract}\n${this.#POOCOIN_URL}/tokens/${contract}\n${
+          this.#PCS_URL
+        }/#/swap?outputCurrency=${contract}`
       );
     });
   }
