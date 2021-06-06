@@ -11,6 +11,7 @@ export default class TelegramService {
       this.bot = new TgApi(this.token, { polling: true });
       this.bot.on('message', (msg) => {
         if (msg.text === '/start') {
+          this.bot.sendMessage(msg.chat.id, 'Success');
           this.chats.push(msg.chat);
         }
       });
