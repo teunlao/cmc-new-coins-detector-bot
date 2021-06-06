@@ -77,7 +77,7 @@ export default class CmcModule {
           clientService.openPoocoinChart(info.contract);
         }
       }
-    }, 1000);
+    }, process.env.TICK_INTERVAL || 1000);
   }
 
   start() {

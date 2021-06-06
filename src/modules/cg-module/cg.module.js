@@ -88,7 +88,7 @@ export default class CgModule {
           }
         }
       }
-    }, 1000);
+    }, process.env.TICK_INTERVAL || 1000);
   }
 
   start() {
