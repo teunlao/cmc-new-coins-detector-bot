@@ -81,7 +81,7 @@ export default class CgModule {
           clientService.openPoocoinChart(info.contract);
         }
       }
-    }, 1000);
+    }, 10000);
   }
 
   start() {

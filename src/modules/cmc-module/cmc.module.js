@@ -65,7 +65,7 @@ export default class CmcModule {
         clientService.openPancakeSwap(info.contract);
         clientService.openPoocoinChart(info.contract);
       }
-    }, 1000);
+    }, 10000);
   }
 
   start() {
