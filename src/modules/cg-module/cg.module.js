@@ -2,14 +2,11 @@ import { clientService, dbService, domService, telegramService, wsService } from
 
 export default class CgModule {
   constructor() {
+    this.name = 'CoinGecko';
     this.isServerSide = !!process.env.IS_SERVER_SIDE;
     this.isTelegramAvailable = !!process.env.TELEGRAM_API_TOKEN;
     this.DB_PATH = 'db/cg.json';
     this.DEFAULT_URL = 'https://www.coingecko.com/';
-    this.state = {
-      previous: [],
-      current: []
-    };
   }
 
   async parseNewTokenUrlsFromDocument() {
@@ -23,6 +20,7 @@ export default class CgModule {
       return newCoinElementLinks.map(({ href }) => href);
     } catch (err) {
       console.warn('[module:CG]: ERROR - parseTokensUrlsFromDocument', err);
+      return null;
     }
   }
 
@@ -30,7 +28,9 @@ export default class CgModule {
     try {
       const url = `${this.DEFAULT_URL}${tokenUrl}`;
       const document = await domService.getDocument(url);
-      const contract = document.querySelector('[data-controller=coin-contract-address] i').getAttribute('data-address');
+      const contract = document
+        .querySelector('[data-controller=coin-contract-address] i')
+        ?.getAttribute('data-address');
 
       // const isBsc =
       //   document
@@ -46,45 +46,36 @@ export default class CgModule {
       }
       return null;
     } catch (err) {
-      console.warn('[module:CG]: ERROR - parseTokenDataFromDocument');
-      throw err;
+      console.warn('[module:CG]: ERROR - parseTokenDataFromDocument', err);
+      return null;
     }
   }
 
-  async updateState() {
-    this.state.previous = [...this.state.current];
-    this.state.current = await this.parseNewTokenUrlsFromDocument();
-  }
-
-  getStateChanges() {
-    return this.state.current.filter((href) => !this.state.previous.includes(href));
+  async getDataChanges() {
+    const allTokens = await this.parseNewTokenUrlsFromDocument();
+    const newTokens = allTokens.filter((href) => !dbService.getData(this.DB_PATH).includes(href));
+    return { allTokens, newTokens };
   }
 
   detectChanges() {
-    let i = 59;
-
     setInterval(async () => {
-      i++;
-      if (i === 60) {
-        console.log('[module:CG]: waiting for new listings...', new Date());
-        i = 0;
-      }
-      await this.updateState();
-      const newTokenUrls = this.getStateChanges();
-
-      if (newTokenUrls.length) {
-        dbService.setData(this.DB_PATH, this.state.current);
-        for (const tokenUrl of newTokenUrls) {
+      console.log('[module:CG]:  waiting...', new Date(Date.now()).toISOString());
+      const { allTokens, newTokens } = await this.getDataChanges();
+      if (newTokens.length) {
+        dbService.setData(this.DB_PATH, allTokens);
+        for (const tokenUrl of newTokens) {
           const info = await this.parseTokenDataFromDocument(tokenUrl);
-          console.log('[module:CG] new contract', info.contract);
-          if (this.isTelegramAvailable) {
-            telegramService.sendAlert({ module: 'CoinGecko', contract: info.contract });
-          }
-          if (this.isServerSide) {
-            wsService.emitAlert({ module: 'CoinGecko', contract: info.contract });
-          } else {
-            clientService.openPancakeSwap(info.contract);
-            clientService.openPoocoinChart(info.contract);
+          if (info) {
+            console.log('[module:CG] new contract', info.contract);
+            if (this.isTelegramAvailable) {
+              telegramService.sendAlert({ module: this.name, contract: info.contract });
+            }
+            if (this.isServerSide) {
+              wsService.emitAlert({ module: this.name, contract: info.contract });
+            } else {
+              clientService.openPancakeSwap(info.contract);
+              clientService.openPoocoinChart(info.contract);
+            }
           }
         }
       }
@@ -93,7 +84,6 @@ export default class CgModule {
 
   start() {
     console.log('[module:CG]: started');
-    this.state.current = dbService.getData(this.DB_PATH);
     this.detectChanges();
   }
 

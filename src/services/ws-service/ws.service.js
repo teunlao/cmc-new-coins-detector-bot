@@ -10,9 +10,13 @@ export default class WsService {
       console.log('socket connection');
     });
 
-    this.server.listen(process.env.PORT || 3000, () => {
-      console.log('HTTP Server started');
-    });
+    if (!!process.env.IS_SERVER_SIDE) {
+      this.server.listen(process.env.PORT || 3000, () => {
+        console.log('HTTP Server started');
+      });
+    } else {
+      console.log('[service:WS]: disabled');
+    }
   }
 
   emitAlert({ module, contract }) {
