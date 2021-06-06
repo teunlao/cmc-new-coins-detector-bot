@@ -5,15 +5,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node --experimental-specifier-resolution=node index.js",
-    "dev": "nodemon --experimental-specifier-resolution=node index.js"
+    "start": "node --require dotenv/config --experimental-specifier-resolution=node index.js",
+    "dev": "nodemon --require dotenv/config --experimental-specifier-resolution=node index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^10.0.0",
     "got": "^11.8.2",
     "jsdom": "^16.6.0",
+    "node-telegram-bot-api": "^0.53.0",
     "open": "^8.2.0",
     "socket.io": "^4.1.2"
   },
@@ -22,6 +24,7 @@
     "@babel/preset-env": "^7.14.4",
     "@types/got": "^9.6.11",
     "@types/jsdom": "^16.2.10",
+    "@types/node-telegram-bot-api": "^0.51.1",
     "@types/socket.io": "^3.0.2",
     "babel-loader": "^8.2.2",
     "babel-preset-es2015-native-modules": "^6.9.4",

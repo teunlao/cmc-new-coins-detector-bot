@@ -1,4 +1,4 @@
-import { clientService, dbService, domService } from '../../services';
+import { clientService, dbService, domService, telegramService } from '../../services';
 
 export default class CmcModule {
   constructor() {
@@ -62,6 +62,7 @@ export default class CmcModule {
       for (const tokenUrl of newTokenUrls) {
         const info = await this.parseTokenDataFromDocument(tokenUrl);
         console.log('[module:CMC] new token', info.contract);
+        telegramService.sendAlert({ module: 'CoinMarketCap', contract: info.contract });
         clientService.openPancakeSwap(info.contract);
         clientService.openPoocoinChart(info.contract);
       }
