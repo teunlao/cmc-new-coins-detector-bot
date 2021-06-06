@@ -1,13 +1,17 @@
-import { clientService, dbService, domService, telegramService } from '../../services';
+import { clientService, dbService, domService, telegramService, wsService } from '../../services';
 
 export default class CmcModule {
   constructor() {
+    this.isServerSide = !!process.env.IS_SERVER_SIDE;
+    this.isTelegramAvailable = !!process.env.TELEGRAM_API_TOKEN;
     this.DB_PATH = 'db/cmc.json';
     this.DEFAULT_URL = 'https://coinmarketcap.com';
     this.state = {
       previous: [],
       current: []
     };
+
+    console.log('isServerSide', this.isServerSide);
   }
 
   async parseNewTokenUrlsFromDocument() {
@@ -61,10 +65,17 @@ export default class CmcModule {
       }
       for (const tokenUrl of newTokenUrls) {
         const info = await this.parseTokenDataFromDocument(tokenUrl);
-        console.log('[module:CMC] new token', info.contract);
-        telegramService.sendAlert({ module: 'CoinMarketCap', contract: info.contract });
-        clientService.openPancakeSwap(info.contract);
-        clientService.openPoocoinChart(info.contract);
+        console.log('[module:CMC] new contract', info.contract);
+        if (this.isTelegramAvailable) {
+          telegramService.sendAlert({ module: 'CoinMarketCap', contract: info.contract });
+        }
+        if (this.isServerSide) {
+          wsService.emitAlert({ module: 'CoinMarketCap', contract: info.contract });
+        } else {
+          console.log('ELSE');
+          clientService.openPancakeSwap(info.contract);
+          clientService.openPoocoinChart(info.contract);
+        }
       }
     }, 1000);
   }

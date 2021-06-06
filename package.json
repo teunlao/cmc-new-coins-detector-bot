@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node --require dotenv/config --experimental-specifier-resolution=node index.js",
+    "ws-client:start": "node --require dotenv/config --experimental-specifier-resolution=node ws-client.js",
     "dev": "nodemon --require dotenv/config --experimental-specifier-resolution=node index.js"
   },
   "keywords": [],
@@ -17,7 +18,8 @@
     "jsdom": "^16.6.0",
     "node-telegram-bot-api": "^0.53.0",
     "open": "^8.2.0",
-    "socket.io": "^4.1.2"
+    "socket.io": "^4.1.2",
+    "socket.io-client": "^4.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",
@@ -26,6 +28,7 @@
     "@types/jsdom": "^16.2.10",
     "@types/node-telegram-bot-api": "^0.51.1",
     "@types/socket.io": "^3.0.2",
+    "@types/socket.io-client": "^3.0.0",
     "babel-loader": "^8.2.2",
     "babel-preset-es2015-native-modules": "^6.9.4",
     "canvas": "^2.8.0",

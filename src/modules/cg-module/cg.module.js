@@ -1,7 +1,9 @@
-import { clientService, dbService, domService, telegramService } from '../../services';
+import { clientService, dbService, domService, telegramService, wsService } from '../../services';
 
 export default class CgModule {
   constructor() {
+    this.isServerSide = !!process.env.IS_SERVER_SIDE;
+    this.isTelegramAvailable = !!process.env.TELEGRAM_API_TOKEN;
     this.DB_PATH = 'db/cg.json';
     this.DEFAULT_URL = 'https://www.coingecko.com/';
     this.state = {
@@ -74,10 +76,16 @@ export default class CgModule {
         dbService.setData(this.DB_PATH, this.state.current);
         for (const tokenUrl of newTokenUrls) {
           const info = await this.parseTokenDataFromDocument(tokenUrl);
-          console.log('[module:CG] new token', info.contract);
-          telegramService.sendAlert({ module: 'CoinGecko', contract: info.contract });
-          clientService.openPancakeSwap(info.contract);
-          clientService.openPoocoinChart(info.contract);
+          console.log('[module:CG] new contract', info.contract);
+          if (this.isTelegramAvailable) {
+            telegramService.sendAlert({ module: 'CoinGecko', contract: info.contract });
+          }
+          if (this.isServerSide) {
+            wsService.emitAlert({ module: 'CoinGecko', contract: info.contract });
+          } else {
+            clientService.openPancakeSwap(info.contract);
+            clientService.openPoocoinChart(info.contract);
+          }
         }
       }
     }, 1000);
